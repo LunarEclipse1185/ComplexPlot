@@ -31,7 +31,7 @@ export class Complex {
   }
   static pow(z: Complex, p: Complex): Complex {
     if (z.re === 0 && z.im === 0) return new Complex(0, 0);
-    const r = z.abs();
+    const r = z.mag();
     const theta = z.arg();
     const log_r = Math.log(r);
     
@@ -45,7 +45,7 @@ export class Complex {
     return new Complex(e_re * Math.cos(z.im), e_re * Math.sin(z.im));
   }
   static log(z: Complex): Complex {
-    return new Complex(Math.log(z.abs()), z.arg());
+    return new Complex(Math.log(z.mag()), z.arg());
   }
   static sqrt(z: Complex): Complex {
     return Complex.pow(z, new Complex(0.5, 0));
@@ -64,6 +64,7 @@ export class Complex {
   }
   
   // --- Instance Methods ---
-  abs(): number { return Math.sqrt(this.re * this.re + this.im * this.im); }
+  mag(): number { return Math.sqrt(this.re * this.re + this.im * this.im); }
+  mag2(): number { return this.re * this.re + this.im * this.im; }
   arg(): number { return Math.atan2(this.im, this.re); }
 }

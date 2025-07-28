@@ -39,6 +39,8 @@ export class UIManager {
       argLegend: this.getElementById<HTMLCanvasElement>('arg-legend'),
       magLegend: this.getElementById<HTMLCanvasElement>('mag-legend'),
     };
+    
+    this.clearInfoPanel();
   }
   
   /**
@@ -95,6 +97,10 @@ export class UIManager {
     const z = new Complex(real, imag);
     
     const isInfinityPlot = domain.name === 'Infinity Neighborhood';
+    if (isInfinityPlot && z.mag2() > 1/64) {
+      this.clearInfoPanel();
+      return;
+    }
     const fz = evaluate(z, isInfinityPlot);
     
     const displayZ = isInfinityPlot ? Complex.inv(z) : z;
