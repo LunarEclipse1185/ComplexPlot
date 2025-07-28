@@ -1,4 +1,4 @@
-import { UIManager } from './ui';
+import { UIManager } from './uiManager.ts';
 import { WebGLRenderer } from './webgl/renderer';
 import { Expression } from './math/parser/expression';
 import { Complex } from './math/complex';
@@ -23,7 +23,6 @@ export class App {
   constructor() {
     this.uiManager = new UIManager();
     
-    // Initialize renderers for both canvases
     this.finiteRenderer = this.createRenderer(this.uiManager.elements.finiteCanvas);
     this.infinityRenderer = this.createRenderer(this.uiManager.elements.infinityCanvas);
     
@@ -111,7 +110,6 @@ export class App {
    * @returns The resulting complex number.
    */
   private getFunctionValueAt(z: Complex, isInfinityPlot: boolean): Complex {
-    // For the infinity plot, the input z from the UI is actually 1/z_domain
     const evalZ = isInfinityPlot ? Complex.inv(z) : z;
     return this.expression.evaluate(evalZ);
   }

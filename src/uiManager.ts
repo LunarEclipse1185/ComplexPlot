@@ -66,7 +66,7 @@ export class UIManager {
   }
   
   public clearError(): void {
-    this.elements.funcInput.classList.remove('error');
+    //this.elements.funcInput.classList.remove('error');
     this.elements.errorPanel.style.display = 'none';
     this.elements.errorPanel.textContent = '';
   }
@@ -133,8 +133,9 @@ export class UIManager {
     
     // Modulus/Lightness Legend
     const gradient = magCtx.createLinearGradient(0, 0, width, 0);
-    gradient.addColorStop(0, '#000');
-    gradient.addColorStop(1, '#fff');
+    gradient.addColorStop(0, "#f00");
+    gradient.addColorStop(0.75, "#f00");
+    gradient.addColorStop(1, "#fff");
     magCtx.fillStyle = gradient;
     magCtx.fillRect(0, 0, width, height);
   }
