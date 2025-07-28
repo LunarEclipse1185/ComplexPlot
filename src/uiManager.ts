@@ -150,12 +150,12 @@ export class UIManager {
     const yStep = (ymax - ymin) / (yMarkers.length - 1);
     
     xMarkers.forEach((span, i) => {
-      (span as HTMLElement).textContent = (xmin + i * xStep).toFixed(4);
+      (span as HTMLElement).textContent = this.toConciseExponential((xmin + i * xStep), 3);
     });
     
     yMarkers.forEach((span, i) => {
       // Y markers are typically ordered top-to-bottom (max to min)
-      (span as HTMLElement).textContent = (ymax - i * yStep).toFixed(4);
+      (span as HTMLElement).textContent = this.toConciseExponential((ymax - i * yStep), 3);
     });
   }
   
@@ -183,7 +183,7 @@ export class UIManager {
     this.elements.infoLocation.textContent = domain.name;
     this.elements.infoZ.textContent = this.formatComplex(displayZ, 4);
     this.elements.infoFz.textContent = this.formatComplex(fz, 4);
-    this.elements.infoMag.textContent = fz.mag().toExponential(4);
+    this.elements.infoMag.textContent = this.toConciseExponential(fz.mag(), 4);
     this.elements.infoArg.textContent = `${(fz.arg() / Math.PI).toFixed(4)} π rad`;
   }
   
@@ -197,7 +197,14 @@ export class UIManager {
   
   private formatComplex(c: Complex, digits: number): string {
     const sign = c.im < 0 ? '-' : '+';
-    return `${c.re.toFixed(digits)} ${sign} ${Math.abs(c.im).toFixed(digits)}i`;
+    return `${this.toConciseExponential(c.re, digits)} ${sign} ${this.toConciseExponential(Math.abs(c.im), digits)} i`;
+  }
+  
+  private toConciseExponential(x: number, n: number): string {
+    if (-10000 < x && x < -0.001 || 0.001 < x && x < 10000 || x == 0)
+      return x.toFixed(n);
+    else
+      return x.toExponential(n);
   }
   
   public drawLegends(): void {

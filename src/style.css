@@ -215,8 +215,10 @@ canvas.plot-canvas {
 }
 
 .plot-markers-y {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   justify-content: space-between;
   text-align: right;
   height: 100%;
