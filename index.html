@@ -13,10 +13,10 @@
   <div class="plot-container">
     <!-- Finite Plot with Axis Markers -->
     <div class="plot-wrapper">
-      <h2>Finite Domain (|z| ≤ 2)</h2>
+      <h2>Finite Domain</h2>
       <div class="plot-grid">
         <div class="plot-axis-label-y">Im(z)</div>
-        <div class="plot-markers-y">
+        <div class="plot-markers-y" id="finite-markers-y">
           <span>2.0</span>
           <span>1.0</span>
           <span>0.0</span>
@@ -24,7 +24,7 @@
           <span>-2.0</span>
         </div>
         <canvas id="finite-canvas" class="plot-canvas" width="400" height="400"></canvas>
-        <div class="plot-markers-x">
+        <div class="plot-markers-x" id="finite-markers-x">
           <span>-2.0</span>
           <span>-1.0</span>
           <span>0.0</span>
@@ -37,16 +37,16 @@
     
     <!-- Infinity Plot with Axis Markers -->
     <div class="plot-wrapper">
-      <h2>Neighborhood of Infinity (|z| > 8)</h2>
+      <h2>Neighborhood of Infinity</h2>
       <div class="plot-grid">
         <div class="plot-axis-label-y">Im(1/z)</div>
-        <div class="plot-markers-y">
+        <div class="plot-markers-y" id="infinity-markers-y">
           <span>0.125</span>
           <span>0.00</span>
           <span>-0.125</span>
         </div>
         <canvas id="infinity-canvas" class="plot-canvas" width="400" height="400"></canvas>
-        <div class="plot-markers-x">
+        <div class="plot-markers-x" id="infinity-markers-x">
           <span>-0.125</span>
           <span>0.00</span>
           <span>0.125</span>

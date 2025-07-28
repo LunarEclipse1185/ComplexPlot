@@ -30,9 +30,9 @@ void main() {
     // We must handle the pole at the origin and the circular boundary.
     if (u_is_infinity_plot) {
         // Discard fragments outside the circular domain for a clean look
-        if (dot(z_domain, z_domain) > 0.125 * 0.125) {
-            discard;
-        }
+        //if (dot(z_domain, z_domain) > 0.125 * 0.125) {
+        //    discard;
+        //}
         // Handle the pole at z_domain = 0 (which is z = infinity)
         if (z_domain.x == 0.0 && z_domain.y == 0.0) {
             gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0); // f(infinity) -> white
@@ -40,22 +40,31 @@ void main() {
         }
     }
 
-    // If it's the infinity plot, we evaluate f(1/z_domain).
-    // Otherwise, we evaluate f(z_domain).
+    // infinity and origin marker
+    vec2 marker_st = u_domain.xz / (u_domain.xz - u_domain.yw);
+    float thres = 0.00005;
+    float width = thres / 2.0;
+    float r = dot(st.xy - marker_st, st.xy - marker_st);
+    // mixing, t=1 : outside
+    float t = smoothstep(thres, thres + width, r);
+
+    // marker color
+    // mixing, t2=1 : ring and outside
+    float t2 = smoothstep(thres - width, thres, r);
+    vec3 marker = vec3(1.0, 1.0, 1.0) * (1.0-t2) + vec3(0.0, 0.0, 0.0) * t2;
+
+    // evaluation
     vec2 z = u_is_infinity_plot ? c_inv(z_domain) : z_domain;
     vec2 fz = F_Z(z);
 
     // --- Domain Coloring ---
     // Hue is determined by the argument (angle) of f(z)
     float hue = (atan(fz.y, fz.x) / (2.0 * PI)) + 0.5;
-
-
     //float lightness = log(dot(fz, fz)) / log(10.0) / 2.0;
     //lightness = clamp(lightness, 0.5, 1.0);
     float lightness = 0.5;
-
     float saturation = 0.9;
 
     vec3 rgb = hsl2rgb(vec3(hue, saturation, lightness));
-    gl_FragColor = vec4(rgb, 1.0);
+    gl_FragColor = vec4(rgb * t + marker * (1.0-t), 1.0);
 }

@@ -1,8 +1,9 @@
 import { Complex } from './math/complex';
-import type {Domain} from './webgl/renderer';
+import {type Domain, WebGLRenderer} from './webgl/renderer';
 
-// A type for the callback function to get f(z)
 type FunctionEvaluator = (z: Complex, isInfinityPlot: boolean) => Complex;
+type PanHandler = (panDelta: { dx: number; dy: number }) => void;
+type ZoomHandler = (zoomData: { factor: number; x: number; y: number }) => void;
 
 /**
  * Manages all direct interactions with the DOM.
@@ -23,6 +24,8 @@ export class UIManager {
     argLegend: HTMLCanvasElement;
     magLegend: HTMLCanvasElement;
   };
+  private isDragging = false;
+  private lastMousePosition = { x: 0, y: 0 };
   
   constructor() {
     // Query all required elements from the DOM once during initialization.
@@ -73,15 +76,87 @@ export class UIManager {
     this.elements.errorPanel.textContent = '';
   }
   
-  /**
-   * Sets up mouse move and leave listeners for a canvas to update the info panel.
-   * @param canvas The canvas element to attach listeners to.
-   * @param domain The rendering domain of the canvas.
-   * @param evaluate The callback function to compute f(z).
-   */
-  public setupCanvasInteraction(canvas: HTMLCanvasElement, domain: Domain, evaluate: FunctionEvaluator): void {
-    canvas.addEventListener('mousemove', (e) => this.updateInfoPanel(e, canvas, domain, evaluate));
-    canvas.addEventListener('mouseleave', () => this.clearInfoPanel());
+  public setupCanvasInteraction(
+    renderer: WebGLRenderer,
+    evaluate: FunctionEvaluator,
+    onPan: PanHandler,
+    onZoom: ZoomHandler
+  ): void {
+    const canvas = renderer.getCanvas();
+    const domain = renderer.getDomain();
+    
+    // --- Panning Listeners ---
+    canvas.addEventListener('mousedown', (e) => {
+      this.isDragging = true;
+      this.lastMousePosition = { x: e.clientX, y: e.clientY };
+      canvas.style.cursor = 'grabbing';
+    });
+    
+    canvas.addEventListener('mouseup', () => {
+      this.isDragging = false;
+      canvas.style.cursor = 'grab';
+    });
+    
+    canvas.addEventListener('mouseleave', () => {
+      this.isDragging = false;
+      this.clearInfoPanel();
+      canvas.style.cursor = 'default';
+    });
+    
+    canvas.addEventListener('mouseenter', () => {
+      canvas.style.cursor = 'grab';
+    });
+    
+    // --- Combined Mouse Move for Panning and Info Panel ---
+    canvas.addEventListener('mousemove', (e) => {
+      if (this.isDragging) {
+        const dx = e.clientX - this.lastMousePosition.x;
+        const dy = e.clientY - this.lastMousePosition.y;
+        this.lastMousePosition = { x: e.clientX, y: e.clientY };
+        
+        const domainWidth = domain.values[1] - domain.values[0];
+        const domainHeight = domain.values[3] - domain.values[2];
+        
+        // Convert pixel delta to domain delta
+        const panDelta = {
+          dx: dx * (domainWidth / canvas.clientWidth),
+          dy: -dy * (domainHeight / canvas.clientHeight) // Y is inverted
+        };
+        onPan(panDelta);
+      }
+      this.updateInfoPanel(e, canvas, domain, evaluate);
+    });
+    
+    // --- Zooming Listener ---
+    canvas.addEventListener('wheel', (e) => {
+      e.preventDefault(); // Prevent page scroll
+      const zoomFactor = e.deltaY < 0 ? 1 / 1.1 : 1.1; // Zoom in or out
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = (e.clientX - rect.left) / rect.width;
+      const mouseY = (e.clientY - rect.top) / rect.height;
+      
+      onZoom({ factor: zoomFactor, x: mouseX, y: mouseY });
+    });
+  }
+  
+  public updateAxisMarkers(domain: Domain): void {
+    const [xmin, xmax, ymin, ymax] = domain.values;
+    const idPrefix = domain.name.includes('Finite') ? 'finite' : 'infinity';
+    
+    const xMarkers = document.querySelectorAll(`#${idPrefix}-markers-x span`);
+    const yMarkers = document.querySelectorAll(`#${idPrefix}-markers-y span`);
+    
+    const xStep = (xmax - xmin) / (xMarkers.length - 1);
+    const yStep = (ymax - ymin) / (yMarkers.length - 1);
+    
+    xMarkers.forEach((span, i) => {
+      (span as HTMLElement).textContent = (xmin + i * xStep).toFixed(4);
+    });
+    
+    yMarkers.forEach((span, i) => {
+      // Y markers are typically ordered top-to-bottom (max to min)
+      (span as HTMLElement).textContent = (ymax - i * yStep).toFixed(4);
+    });
   }
   
   private updateInfoPanel(event: MouseEvent, canvas: HTMLCanvasElement, domain: Domain, evaluate: FunctionEvaluator): void {
@@ -97,10 +172,10 @@ export class UIManager {
     const z = new Complex(real, imag);
     
     const isInfinityPlot = domain.name === 'Infinity Neighborhood';
-    if (isInfinityPlot && z.mag2() > 1/64) {
-      this.clearInfoPanel();
-      return;
-    }
+    // if (isInfinityPlot && z.mag2() > 1/64) {
+    //   this.clearInfoPanel();
+    //   return;
+    // }
     const fz = evaluate(z, isInfinityPlot);
     
     const displayZ = isInfinityPlot ? Complex.inv(z) : z;

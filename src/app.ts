@@ -32,6 +32,9 @@ export class App {
     this.addEventListeners();
     this.uiManager.drawLegends();
     
+    this.uiManager.updateAxisMarkers(this.finiteRenderer.getDomain());
+    this.uiManager.updateAxisMarkers(this.infinityRenderer.getDomain());
+    
     // Perform the initial drawing with the default function "z"
     this.updateAndRedraw();
   }
@@ -61,17 +64,56 @@ export class App {
       this.debounceTimeout = setTimeout(() => this.updateAndRedraw(), 150);
     });
     
-    // Setup mouse interactions for both canvases to display info
+    // Setup interactions for the finite plot
     this.uiManager.setupCanvasInteraction(
-      this.finiteRenderer.getCanvas(),
-      this.finiteRenderer.getDomain(),
-      (z, isInfinityPlot) => this.getFunctionValueAt(z, isInfinityPlot)
+      this.finiteRenderer,
+      (z, isInfinityPlot) => this.getFunctionValueAt(z, isInfinityPlot),
+      (panDelta) => this.handlePan(this.finiteRenderer, panDelta),
+      (zoomData) => this.handleZoom(this.finiteRenderer, zoomData)
     );
+    
+    // Setup interactions for the infinity plot
     this.uiManager.setupCanvasInteraction(
-      this.infinityRenderer.getCanvas(),
-      this.infinityRenderer.getDomain(),
-      (z, isInfinityPlot) => this.getFunctionValueAt(z, isInfinityPlot)
+      this.infinityRenderer,
+      (z, isInfinityPlot) => this.getFunctionValueAt(z, isInfinityPlot),
+      (panDelta) => this.handlePan(this.infinityRenderer, panDelta),
+      (zoomData) => this.handleZoom(this.infinityRenderer, zoomData)
     );
+  }
+  
+  private handlePan(renderer: WebGLRenderer, panDelta: { dx: number; dy: number }): void {
+    const domain = renderer.getDomain();
+    domain.values[0] -= panDelta.dx;
+    domain.values[1] -= panDelta.dx;
+    domain.values[2] -= panDelta.dy;
+    domain.values[3] -= panDelta.dy;
+    
+    renderer.draw(domain.name === 'Infinity Neighborhood');
+    this.uiManager.updateAxisMarkers(domain);
+  }
+  
+  private handleZoom(renderer: WebGLRenderer, zoomData: { factor: number; x: number; y: number }): void {
+    const domain = renderer.getDomain();
+    const [xmin, xmax, ymin, ymax] = domain.values;
+    
+    const width = xmax - xmin;
+    const height = ymax - ymin;
+    
+    // Determine the complex coordinate under the mouse
+    const mouseRe = xmin + zoomData.x * width;
+    const mouseIm = ymin + (1 - zoomData.y) * height;
+    
+    const newWidth = width * zoomData.factor;
+    const newHeight = height * zoomData.factor;
+    
+    // Adjust domain to keep the point under the mouse stationary
+    domain.values[0] = mouseRe - zoomData.x * newWidth;
+    domain.values[1] = mouseRe + (1 - zoomData.x) * newWidth;
+    domain.values[2] = mouseIm - (1 - zoomData.y) * newHeight;
+    domain.values[3] = mouseIm + zoomData.y * newHeight;
+    
+    renderer.draw(domain.name === 'Infinity Neighborhood');
+    this.uiManager.updateAxisMarkers(domain);
   }
   
   /**
