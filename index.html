@@ -1,82 +1,177 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Complex Function Plotter</title>
-  </head>
-  <body>
-  <div class="main-container">
-    <h1>Complex Function Plotter</h1>
-    
-    <div class="plot-container">
-      <div class="plot-wrapper">
-        <h2>Finite Domain (|z| &lt; 2)</h2>
-        <canvas
-          id="finite-canvas"
-          class="plot-canvas"
-          width="400"
-          height="400"
-        ></canvas>
-      </div>
-      <div class="plot-wrapper">
-        <h2>Neighborhood of Infinity (|z| > 8)</h2>
-        <canvas
-          id="infinity-canvas"
-          class="plot-canvas"
-          width="400"
-          height="400"
-        ></canvas>
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Complex Function Plotter</title>
+  <style>
+      .plot-wrapper {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+      }
+
+      .plot-grid {
+          display: grid;
+          grid-template-columns: auto auto auto;
+          align-items: center;
+          /*gap: 0.5rem;*/
+          font-size: 0.8rem;
+          color: var(--info-label-color, #888);
+      }
+
+      .plot-axis-label-y {
+          writing-mode: vertical-rl;
+          transform: rotate(180deg);
+          text-align: center;
+          letter-spacing: 1px;
+      }
+
+      .plot-axis-label-x {
+          grid-row: 3;
+          grid-column: 3;
+          text-align: center;
+          letter-spacing: 1px;
+      }
+
+      .plot-markers-y {
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          text-align: right;
+          height: 100%;
+          padding-right: 0.25rem;
+      }
+
+      .plot-markers-x {
+          grid-row: 2;
+          grid-column: 3;
+          display: flex;
+          justify-content: space-between;
+          width: 100%;
+      }
+
+      .legend {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 0.25rem;
+      }
+
+      .legend-markers {
+          width: 100%;
+          display: flex;
+          justify-content: space-between;
+          font-size: 0.75rem;
+          color: var(--info-label-color, #888);
+      }
+  </style>
+</head>
+<body>
+<div class="main-container">
+  <h1>Complex Function Plotter</h1>
+  
+  <div class="plot-container">
+    <!-- Finite Plot with Axis Markers -->
+    <div class="plot-wrapper">
+      <h2>Finite Domain (|z| ≤ 2)</h2>
+      <div class="plot-grid">
+        <div class="plot-axis-label-y">Im(z)</div>
+        <div class="plot-markers-y">
+          <span>2.0</span>
+          <span>1.0</span>
+          <span>0.0</span>
+          <span>-1.0</span>
+          <span>-2.0</span>
+        </div>
+        <canvas id="finite-canvas" class="plot-canvas" width="400" height="400"></canvas>
+        <div class="plot-markers-x">
+          <span>-2.0</span>
+          <span>-1.0</span>
+          <span>0.0</span>
+          <span>1.0</span>
+          <span>2.0</span>
+        </div>
+        <div class="plot-axis-label-x">Re(z)</div>
       </div>
     </div>
     
-    <div class="controls-container">
-      <div class="function-input-wrapper">
-        <label for="function-input">f(z) =</label>
-        <div class="function-input-inner">
-          <div id="error-panel"></div>
-          <input type="text" id="function-input" value="z" />
+    <!-- Infinity Plot with Axis Markers -->
+    <div class="plot-wrapper">
+      <h2>Neighborhood of Infinity (|z| > 8)</h2>
+      <div class="plot-grid">
+        <div class="plot-axis-label-y">Im(1/z)</div>
+        <div class="plot-markers-y">
+          <span>0.125</span>
+          <span>0.00</span>
+          <span>-0.125</span>
         </div>
-      </div>
-      
-      <div class="legends-wrapper">
-        <div class="legend">
-          <span>Argument (Hue)</span>
-          <canvas
-            id="arg-legend"
-            width="256"
-            height="30"
-          ></canvas>
+        <canvas id="infinity-canvas" class="plot-canvas" width="400" height="400"></canvas>
+        <div class="plot-markers-x">
+          <span>-0.125</span>
+          <span>0.00</span>
+          <span>0.125</span>
         </div>
-        <div class="legend">
-          <span>Modulus (Lightness)</span>
-          <canvas
-            id="mag-legend"
-            width="256"
-            height="30"
-          ></canvas>
-        </div>
-      </div>
-      
-      <div class="info-wrapper">
-        <div id="info-panel">
-          <span>Values at Mouse Position</span><br />
-          <span class="label">Plot:</span>
-          <span id="info-location" class="value"></span><br />
-          <span class="label">z =</span>
-          <span id="info-z" class="value"></span><br />
-          <span class="label">f(z) =</span>
-          <span id="info-fz" class="value"></span><br />
-          <span class="label">|f(z)| =</span>
-          <span id="info-mag" class="value"></span><br />
-          <span class="label">arg(f(z)) =</span>
-          <span id="info-arg" class="value"></span>
-        </div>
+        <div class="plot-axis-label-x">Re(1/z)</div>
       </div>
     </div>
   </div>
   
-  <script type="module" src="/src/main.ts"></script>
-  </body>
+  <div class="controls-container">
+    <div class="function-input-wrapper">
+      <label for="function-input">f(z) =</label>
+      <div class="function-input-inner">
+        <div id="error-panel"></div>
+        <input type="text" id="function-input" value="z" />
+      </div>
+    </div>
+    
+    <div class="legends-wrapper">
+      <!-- Argument Legend with Markers -->
+      <div class="legend">
+        <span>Argument (Hue)</span>
+        <canvas id="arg-legend" width="256" height="30"></canvas>
+        <div class="legend-markers">
+          <span>0°</span>
+          <span>90°</span>
+          <span>180°</span>
+          <span>270°</span>
+          <span>360°</span>
+        </div>
+      </div>
+      <!-- Modulus Legend with Markers -->
+      <div class="legend">
+        <span>Modulus (Lightness)</span>
+        <canvas id="mag-legend" width="256" height="30"></canvas>
+        <div class="legend-markers">
+          <span>10⁻²</span>
+          <span>10⁻¹</span>
+          <span>10⁰</span>
+          <span>10¹</span>
+          <span>10²</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="info-wrapper">
+      <div id="info-panel">
+        <span>Values at Mouse Position</span><br />
+        <span class="label">Plot:</span>
+        <span id="info-location" class="value"></span><br />
+        <span class="label">z =</span>
+        <span id="info-z" class="value"></span><br />
+        <span class="label">f(z) =</span>
+        <span id="info-fz" class="value"></span><br />
+        <span class="label">|f(z)| =</span>
+        <span id="info-mag" class="value"></span><br />
+        <span class="label">arg(f(z)) =</span>
+        <span id="info-arg" class="value"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="/src/main.ts"></script>
+</body>
 </html>
