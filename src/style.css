@@ -6,6 +6,7 @@
   --accent-color: #007acc;
   --font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   --monospace-font: "Consolas", "Menlo", "Monaco", monospace;
+  --autofill-bg-color: #001033;
 
   --error-text-color: #ff1717;
   --error-border-color: #d40000;
@@ -22,6 +23,7 @@
     --panel-bg: #ffffff;
     --input-bg: #ffffff;
     --info-label-color: #6c757d;
+    --autofill-bg-color: #e8f0fe;
 
     --error-text-color: #ff0000;
     --error-border-color: #ff0000;
@@ -148,6 +150,13 @@ canvas.plot-canvas {
 }
 #function-input:focus {
   border-color: var(--accent-color);
+}
+#function-input:autofill {
+  /* not working in Arc */
+  background-color: var(--autofill-bg-color) !important;
+}
+#function-input.error {
+  border-color: var(--error-border-color);
 }
 
 .legends-wrapper,

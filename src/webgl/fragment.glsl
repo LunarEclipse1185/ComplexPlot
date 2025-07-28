@@ -50,9 +50,9 @@ void main() {
     float hue = (atan(fz.y, fz.x) / (2.0 * PI)) + 0.5;
 
 
-    float lightness = log(dot(z_domain, z_domain)) / log(10.0) / 2.0;
-    lightness = clamp(lightness, 0.5, 1.0);
-    //float lightness = 0.5;
+    //float lightness = log(dot(fz, fz)) / log(10.0) / 2.0;
+    //lightness = clamp(lightness, 0.5, 1.0);
+    float lightness = 0.5;
 
     float saturation = 0.9;
 

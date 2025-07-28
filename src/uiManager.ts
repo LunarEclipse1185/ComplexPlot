@@ -68,7 +68,7 @@ export class UIManager {
   }
   
   public clearError(): void {
-    //this.elements.funcInput.classList.remove('error');
+    this.elements.funcInput.classList.remove('error');
     this.elements.errorPanel.style.display = 'none';
     this.elements.errorPanel.textContent = '';
   }
@@ -108,7 +108,7 @@ export class UIManager {
     this.elements.infoLocation.textContent = domain.name;
     this.elements.infoZ.textContent = this.formatComplex(displayZ, 4);
     this.elements.infoFz.textContent = this.formatComplex(fz, 4);
-    this.elements.infoMag.textContent = fz.abs().toExponential(4);
+    this.elements.infoMag.textContent = fz.mag().toExponential(4);
     this.elements.infoArg.textContent = `${(fz.arg() / Math.PI).toFixed(4)} π rad`;
   }
   
