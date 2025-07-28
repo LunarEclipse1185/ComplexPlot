@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Complex Function Plotter</title>
+  </head>
+  <body>
+  <div class="main-container">
+    <h1>Complex Function Plotter</h1>
+    
+    <div class="plot-container">
+      <div class="plot-wrapper">
+        <h2>Finite Domain (|z| &lt; 2)</h2>
+        <canvas
+          id="finite-canvas"
+          class="plot-canvas"
+          width="400"
+          height="400"
+        ></canvas>
+      </div>
+      <div class="plot-wrapper">
+        <h2>Neighborhood of Infinity (|z| > 8)</h2>
+        <canvas
+          id="infinity-canvas"
+          class="plot-canvas"
+          width="400"
+          height="400"
+        ></canvas>
+      </div>
+    </div>
+    
+    <div class="controls-container">
+      <div class="function-input-wrapper">
+        <label for="function-input">f(z) =</label>
+        <div class="function-input-inner">
+          <div id="error-panel"></div>
+          <input type="text" id="function-input" value="z" />
+        </div>
+      </div>
+      
+      <div class="legends-wrapper">
+        <div class="legend">
+          <span>Argument (Hue)</span>
+          <canvas
+            id="arg-legend"
+            width="256"
+            height="30"
+          ></canvas>
+        </div>
+        <div class="legend">
+          <span>Modulus (Lightness)</span>
+          <canvas
+            id="mag-legend"
+            width="256"
+            height="30"
+          ></canvas>
+        </div>
+      </div>
+      
+      <div class="info-wrapper">
+        <div id="info-panel">
+          <span>Values at Mouse Position</span><br />
+          <span class="label">Plot:</span>
+          <span id="info-location" class="value"></span><br />
+          <span class="label">z =</span>
+          <span id="info-z" class="value"></span><br />
+          <span class="label">f(z) =</span>
+          <span id="info-fz" class="value"></span><br />
+          <span class="label">|f(z)| =</span>
+          <span id="info-mag" class="value"></span><br />
+          <span class="label">arg(f(z)) =</span>
+          <span id="info-arg" class="value"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
